@@ -7,7 +7,7 @@ In this project, you can choose to complete the project provided for you, or def
 ### Udacity Provided Project
 In the Udacity provided project, you'll work with four datasets to complete the project. The main dataset will include data on immigration to the United States, and supplementary datasets will include data on airport codes, U.S. city demographics, and temperature data. You're also welcome to enrich the project with additional data if you'd like to set your project apart.
 
-###Open-Ended Project
+### Open-Ended Project
 If you decide to design your own project, you can find useful information in the Project Resources section. Rather than go through steps below with the data Udacity provides, you'll gather your own data, and go through the same process.
 
 ## Instructions
