@@ -27,7 +27,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"size\": 1000,\r\n    \"query\": {\r\n        \"bool\": {\r\n            \"must\": [\r\n                {\r\n                    \"match\": {\r\n                        \"estabelecimento_uf\": \"MA\"\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    }\r\n}",
+					"raw": "{\r\n    \"_source\": false,\r\n    \"query\": {\r\n        \"bool\": {\r\n            \"must\": [\r\n                {\r\n                    \"match\": {\r\n                        \"estabelecimento_uf\": \"MA\"\r\n                    }\r\n                },\r\n                {\r\n                    \"match\": {\r\n                        \"estabelecimento_municipio_nome\": \"PINHEIRO\"\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -44,6 +44,52 @@
 						"br"
 					],
 					"path": [
+						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://elastic-leitos.saude.gov.br/leito_ocupacao/_search",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "aQbLL3ZStaTr38tj",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "user-api-leitos",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"query\": {\r\n        \"bool\": {\r\n            \"must\": [\r\n                {\r\n                    \"match\": {\r\n                        \"estadoSigla\": \"MA\"\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://elastic-leitos.saude.gov.br/leito_ocupacao/_search",
+					"protocol": "https",
+					"host": [
+						"elastic-leitos",
+						"saude",
+						"gov",
+						"br"
+					],
+					"path": [
+						"leito_ocupacao",
 						"_search"
 					]
 				}
