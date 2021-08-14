@@ -1,0 +1,15 @@
+{
+    "paciente_id": "Identificador do vacinado",
+    "paciente_idade": "Idade do vacinado",
+    "paciente_datanascimento": "Data de nascimento do vacinado",
+    "paciente_enumsexobiologico": "Sexo",
+    "paciente_endereco_nmpais": "País",
+    "paciente_endereco_uf": "Sigla UF",
+    "paciente_endereco_nmmunicipio": "Município do vacinado",
+    "estabelecimento_razaosocial": "Razão social do responsável pela vacinação",
+    "estabelecimento_nofantasia": "Nome do local de vacinação",
+    "estabelecimento_uf": "UF do local de vacinação",
+    "estabelecimento_municipio_nome": "Município do local de vacinação",
+    "vacina_grupoatendimento_codigo": "Código do grupo de vacinação",
+    "vacina_grupoatendimento_nome": "Nome do grupo de vacinação"
+}
