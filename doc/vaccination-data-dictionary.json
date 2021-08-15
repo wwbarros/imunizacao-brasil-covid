@@ -7,9 +7,14 @@
     "paciente_endereco_uf": "Sigla UF",
     "paciente_endereco_nmmunicipio": "Município do vacinado",
     "estabelecimento_razaosocial": "Razão social do responsável pela vacinação",
-    "estabelecimento_nofantasia": "Nome do local de vacinação",
+    "estalecimento_nofantasia": "Nome do local de vacinação",
     "estabelecimento_uf": "UF do local de vacinação",
     "estabelecimento_municipio_nome": "Município do local de vacinação",
+    "vacina_categoria_codigo": "Código da categoria",
+    "vacina_categoria_nome": "Descrição da categoria",
     "vacina_grupoatendimento_codigo": "Código do grupo de vacinação",
-    "vacina_grupoatendimento_nome": "Nome do grupo de vacinação"
+    "vacina_grupoatendimento_nome": "Nome do grupo de vacinação",
+    "vacina_fabricante_nome": "Fabricante da vacina",
+    "vacina_codigo": "Código da vacina",
+    "vacina_nome": "Nome da vacina"
 }
