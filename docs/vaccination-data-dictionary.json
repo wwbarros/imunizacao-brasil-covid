@@ -17,5 +17,6 @@
     "vacina_fabricante_nome": "Fabricante da vacina",
     "vacina_codigo": "Código da vacina",
     "vacina_nome": "Nome da vacina",
-    "vacina_dataaplicacao": "Data da aplicação"
+    "vacina_dataaplicacao": "Data da aplicação",
+    "vacina_descricao_dose": "Dose da vacina"
 }
