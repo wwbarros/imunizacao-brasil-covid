@@ -1,0 +1,58 @@
+{
+  "vaccines": {
+    "description": "Vaccines and suppliers",
+    "fields": {
+      "id": "Identity field",
+      "name": "Vaccine name",
+      "supplier": "Laboratory/supplier"
+    }
+  },
+  "health_institution": {
+    "description": "Hospitals, Nursing home, Clinics",
+    "fields": {
+      "id": "Identity field",
+      "name": "Institution name",
+      "organization": "",
+      "state": "Brazilian State",
+      "city": "City name"
+    }
+  },
+  "category": {
+    "description": "Priority groups",
+    "fields": {
+      "id": "Identity field",
+      "name": "Group name"
+    }
+  },
+  "population_group": {
+    "description": "Demograph group (professions, age group, ethnicity)",
+    "fields": {
+      "id": "Identity field",
+      "name": "Group name"
+    }
+  },
+  "patient": {
+    "description": "Demograph data (age, city, gender)",
+    "fields": {
+      "id": "Identity field",
+      "age": "Patient age (years)",
+      "birthdate": "Birth date",
+      "gender": "Male/Female",
+      "country": "Country (Brazil)",
+      "state": "Brazilian State",
+      "city": "City name"
+    }
+  },
+  "imunization": {
+    "description": "Dimensions, First | second dose, date",
+    "fields": {
+      "patient_id": "(FK) Patient Identity",
+      "health_institution_id": "(FK) Health institution Identity",
+      "category_id": "(FK) Category group Identity",
+      "population_group_id": "(FK) Population group Identity",
+      "vaccines_id": "(FK) Vaccine Identity",
+      "vaccines_dose": "First/Second dose",
+      "jab_date": "Vaccine date"
+    }
+  }
+}
