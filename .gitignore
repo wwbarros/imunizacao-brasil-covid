@@ -129,4 +129,5 @@ dmypy.json
 .pyre/
 
 /data/*.csv
+/data/registros/**/*.csv
 /data/output_data/*.parquet
