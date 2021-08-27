@@ -6,6 +6,7 @@
     "paciente_endereco_nmpais": "País",
     "paciente_endereco_uf": "Sigla UF",
     "paciente_endereco_nmmunicipio": "Município do vacinado",
+    "paciente_racacor_valor": "Município do vacinado",
     "estabelecimento_valor": "Identificador do local de vacinação",
     "estabelecimento_razaosocial": "Razão social do responsável pela vacinação",
     "estalecimento_nofantasia": "Nome do local de vacinação",
