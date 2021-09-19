@@ -73,23 +73,23 @@ def transform(df: DataFrame, path_colunas_utilizadas: str) -> DataFrame:
 
 def load(spark: SparkSession, df: DataFrame, path_output: dict):
     print('Criar tabela dimensão Vacinas')
-    load_dataframe_to_parquet(spark, df, path_output, "vacinas", sql_queries.vacinas_select, True, ['codigo', 'descricao'], ['codigo'])
+    save_dataframe_to_parquet(spark, df, path_output, "vacinas", sql_queries.vacinas_select, True, ['codigo', 'descricao'], ['codigo'])
 
     print('Criar tabela dimensão Estabelecimentos')
-    load_dataframe_to_parquet(spark, df, path_output, "estabelecimentos", sql_queries.estabelecimentos_select, True, ['codigo', 'descricao'])
+    save_dataframe_to_parquet(spark, df, path_output, "estabelecimentos", sql_queries.estabelecimentos_select, True, ['codigo', 'descricao'])
 
     print('Criar tabela dimensão Categorias')
-    load_dataframe_to_parquet(spark, df, path_output, "categorias", sql_queries.categorias_select, True, ['codigo', 'descricao'])
+    save_dataframe_to_parquet(spark, df, path_output, "categorias", sql_queries.categorias_select, True, ['codigo', 'descricao'])
 
     print('Criar tabela dimensão Grupos de Atendimento')
-    load_dataframe_to_parquet(spark, df, path_output, "grupos", sql_queries.grupos_select, True, ['codigo', 'descricao'])
+    save_dataframe_to_parquet(spark, df, path_output, "grupos", sql_queries.grupos_select, True, ['codigo', 'descricao'])
 
     print('Criar tabela fato Vacinação')
-    load_dataframe_to_parquet(spark, df, path_output, "vacinacao", sql_queries.vacinacao_select, True, \
+    save_dataframe_to_parquet(spark, df, path_output, "vacinacao", sql_queries.vacinacao_select, True, \
         ['paciente_id', 'estabelecimento', 'categoria', 'grupoatendimento', 'vacina', 'idade', 'sexo', 'uf', 'municipio', 'lote', 'dose', 'dataaplicacao'])
     
 
-def load_dataframe_to_parquet(spark: SparkSession, df: DataFrame, file_path: str, table_name: str, sql_select: str, check_content: bool=True, cols_notnull: list=None, cols_uniquekey: list=None):
+def save_dataframe_to_parquet(spark: SparkSession, df: DataFrame, file_path: str, table_name: str, sql_select: str, check_content: bool=True, cols_notnull: list=None, cols_uniquekey: list=None):
     df_table = get_data_table(spark, df, table_name, sql_select)
 
     if check_content and not check_has_content(df_table): raise Exception(f'No content: {table_name}')
@@ -107,7 +107,7 @@ def main():
     DATA_LOCATION = config['COMMON']['DATA_LOCATION']
     config_values = {
         'columns': config['COMMON']['DATA_COLUMNS'],
-        'source_data': config[DATA_LOCATION]['INPUT_DATA_VACCINES'],
+        'source_data': config[DATA_LOCATION]['INPUT_DATA'],
         'output_data': config[DATA_LOCATION]['OUTPUT_DATA']
     }
 
