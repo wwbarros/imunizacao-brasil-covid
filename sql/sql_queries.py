@@ -55,3 +55,18 @@ select_queries = {
     'grupos': grupos_select,
     'vacinacao': vacinacao_select
 }
+
+default_upsert = ("""
+INSERT dbo.{tabela}([codigo], [descricao]) 
+  SELECT {codigo}, '{descricao}'
+  WHERE NOT EXISTS
+  (
+    SELECT 1 FROM dbo.{tabela} WITH (UPDLOCK, SERIALIZABLE)
+      WHERE [codigo] = {codigo}
+  );
+ 
+IF @@ROWCOUNT = 0
+BEGIN
+  UPDATE dbo.{tabela} SET [descricao] = '{descricao}' WHERE [codigo] = {codigo} AND '{descricao}' <> 'N/A';
+END
+""")
