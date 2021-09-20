@@ -1,9 +1,21 @@
 # Bibliotecas utilizadas
 import configparser
 import pandas as pd
+import pyodbc
 from sql import sql_queries
 from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
+
+def create_db_connection(driver: str, server: str, database: str, user: str, password: str):
+    conn_str = (f"DRIVER={driver};"
+                f"Server={server};"
+                f"Database={database};"
+                f"UID={user}"
+                f"PWD={password}")
+
+    cnxn = pyodbc.connect(conn_str)
+
+    return cnxn
 
 def write_parquet(df: DataFrame, file_path: str, parquet_name: str, mode: str="overwrite", partitionby: str=None):
     parquet_path = f'{file_path}{parquet_name}.parquet'
@@ -71,9 +83,10 @@ def transform(df: DataFrame, path_colunas_utilizadas: str) -> DataFrame:
 
     return df
 
-def load(spark: SparkSession, df: DataFrame, path_output: dict):
+def load(spark: SparkSession, df: DataFrame, path_output: dict, db_connection: any):
     print('Criar tabela dimensão Vacinas')
     save_dataframe_to_parquet(spark, df, path_output, "vacinas", sql_queries.vacinas_select, True, ['codigo', 'descricao'], ['codigo'])
+    save_parquet_to_database(spark, path_output, "vacinas", db_connection)
 
     print('Criar tabela dimensão Estabelecimentos')
     save_dataframe_to_parquet(spark, df, path_output, "estabelecimentos", sql_queries.estabelecimentos_select, True, ['codigo', 'descricao'])
@@ -98,6 +111,9 @@ def save_dataframe_to_parquet(spark: SparkSession, df: DataFrame, file_path: str
     
     write_parquet(df_table, file_path, table_name)
 
+def save_parquet_to_database(spark: SparkSession, file_path: str, parquet_name: str, db_connection: any):
+    pass
+    
 
 def main():
     # Read config file
@@ -117,7 +133,9 @@ def main():
 
     df = transform(df, config_values['columns'])
 
-    load(spark, df, config_values['output_data'])
+    db = create_db_connection(config['DB']['DRIVER'], config['DB']['SERVER'], config['DB']['DATABASE'], config['DB']['USER'], config['DB']['PASSWORD'])
+
+    load(spark, df, config_values['output_data'], db)
 
 
 if __name__ == "__main__":
