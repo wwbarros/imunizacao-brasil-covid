@@ -70,3 +70,31 @@ BEGIN
   UPDATE dbo.{tabela} SET [descricao] = '{descricao}' WHERE [codigo] = {codigo} AND '{descricao}' <> 'N/A';
 END
 """)
+
+estabelecimentos_upsert = ("""
+INSERT INTO [dbo].[estabelecimentos]
+           ([codigo]
+           ,[descricao]
+           ,[razaosocial]
+           ,[uf]
+           ,[municipio])
+     SELECT {codigo}
+           ,'{descricao}'
+           ,'{razaosocial}'
+           ,'{uf}'
+           ,'{municipio}'
+       WHERE NOT EXISTS
+      (
+        SELECT 1 FROM dbo.[estabelecimentos] WITH (UPDLOCK, SERIALIZABLE)
+          WHERE [codigo] = {codigo}
+      );
+IF @@ROWCOUNT = 0
+BEGIN
+  UPDATE [dbo].[estabelecimentos]
+   SET [descricao] = '{descricao}'
+      ,[razaosocial] = '{razaosocial}'
+      ,[uf] = '{uf}'
+      ,[municipio] = '{municipio}'
+ WHERE [codigo] = {codigo} AND '{descricao}' <> 'N/A';
+END
+""")

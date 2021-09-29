@@ -1,44 +1,37 @@
-CREATE TABLE vaccines
-(
-  id int not null,
-  name  string not null,
-  supplier string not null
-);
-CREATE TABLE health_institution
-(
-  id int NOT NULL,
-  name string NOT NULL
-  organization string NOT NULL
-  state string NOT NULL
-  city string NOT NULL
-);
-CREATE TABLE category
-(
-  id int NOT NULL
-  name string NOT NULL
-);
-CREATE TABLE population_group
-(
-  id string NOT NULL
-  name string NOT NULL
-); 
-CREATE TABLE patient
-(
-  id string NOT NULL
-  age int NOT NULL
-  birthdate date NOT NULL
-  gender string NOT NULL
-  country string NOT NULL
-  state string NOT NULL
-  city string NOT NULL
-);
-CREATE TABLE imunization
-(
-  patient_id string NOT NULL
-  health_institution_id int NOT NULL
-  category_id int NOT NULL
-  population_group_id string NOT NULL
-  vaccines_id int NOT NULL
-  vaccines_dose string NOT NULL
-  jab_date date NOT NULL
+CREATE TABLE [vacinas](
+	[codigo] [int] NOT NULL,
+	[descricao] [nvarchar](255) NOT NULL
+)
+CREATE TABLE [categorias](
+	[codigo] [int] NOT NULL,
+	[descricao] [nvarchar](255) NOT NULL
+)
+
+CREATE TABLE [estabelecimentos](
+	[codigo] [int] NOT NULL,
+	[descricao] [nvarchar](255) NOT NULL,
+	[razaosocial] [nvarchar](255) NOT NULL,
+	[uf] [nvarchar](2) NOT NULL,
+	[municipio] [nvarchar](50) NOT NULL
+)
+
+CREATE TABLE [grupos](
+	[codigo] [int] NOT NULL,
+	[descricao] [nvarchar](255) NOT NULL
+)
+
+CREATE TABLE [vacinacao](
+	[paciente_id] [nvarchar](50) NOT NULL,
+	[estabelecimento] [int] NOT NULL,
+	[categoria] [int] NOT NULL,
+	[grupoatendimento] [int] NOT NULL,
+	[vacina] [int] NOT NULL,
+	[idade] [int] NOT NULL,
+	[sexo] [nvarchar](2) NOT NULL,
+	[uf] [nvarchar](2) NOT NULL,
+	[municipio] [nvarchar](50) NOT NULL,
+	[lote] [nvarchar](50) NOT NULL,
+	[fornecedor] [nvarchar](50) NOT NULL,
+	[dose] [nvarchar](50) NOT NULL,
+	[dataaplicacao] [date] NOT NULL
 );
