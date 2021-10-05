@@ -21,7 +21,7 @@ CREATE TABLE [grupos](
 )
 
 CREATE TABLE [vacinacao](
-	[paciente_id] [nvarchar](50) NOT NULL,
+	[paciente_id] [nvarchar](100) NOT NULL,
 	[estabelecimento] [int] NOT NULL,
 	[categoria] [int] NOT NULL,
 	[grupoatendimento] [int] NOT NULL,

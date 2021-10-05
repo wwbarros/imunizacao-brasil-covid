@@ -4,6 +4,7 @@ import pandas as pd
 import pyodbc
 from sql import sql_queries
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import to_date
 from pyspark.sql.dataframe import DataFrame
 
 
@@ -63,6 +64,17 @@ def get_data_table(spark: SparkSession, df: DataFrame, table_name: str, sql_sele
     return sql_df
 
 
+def save_dataframe_to_parquet(spark: SparkSession, df_table: DataFrame, file_path: str, table_name: str, check_content: bool = True, cols_notnull: list = None, cols_uniquekey: list = None):
+    if check_content and not check_has_content(df_table):
+        raise Exception(f'No content: {table_name}')
+    if cols_notnull is not None and not check_nulls(spark, df_table, cols_notnull, 0):
+        raise Exception(f'Null: {table_name}')
+    if cols_uniquekey is not None and not check_uniquekey(df_table, cols_uniquekey):
+        raise Exception(f'Unique Key Fail: {table_name}')
+
+    write_parquet(df_table, file_path, table_name)
+
+
 def extract(spark: SparkSession, path_source: str) -> DataFrame:
     df = spark.read.csv(path_source, sep=';', header=True)
 
@@ -74,9 +86,13 @@ def transform(spark: SparkSession, df: DataFrame, path_colunas_utilizadas: str, 
     col_names = pd.read_json(path_colunas_utilizadas, typ='series')
     colunas_utilizadas = col_names.index
 
-    # Obter as colunas não utilizadas
+    # Remover as colunas não utilizadas
     colunas_naoutilizadas = list(set(df.columns) - set(colunas_utilizadas))
     df = df.drop(*colunas_naoutilizadas)
+
+    # Formatar data
+    df = df.withColumn('vacina_dataaplicacao', to_date(
+        'vacina_dataaplicacao', "yyyy-MM-dd"))
 
     # Trocar os valores Nulos
     df = df.fillna(
@@ -118,42 +134,60 @@ def transform(spark: SparkSession, df: DataFrame, path_colunas_utilizadas: str, 
     df_vacinacao = get_data_table(
         spark, df, "vacinacao", sql_queries.vacinacao_select)
     save_dataframe_to_parquet(spark, df_vacinacao, path_output, "vacinacao", True,
-                              ['paciente_id', 'estabelecimento', 'categoria', 'grupoatendimento', 'vacina', 'idade', 'sexo', 'uf', 'municipio', 'lote', 'dose', 'dataaplicacao'])
+                              ['paciente_id', 'estabelecimento', 'categoria', 'grupoatendimento', 'vacina', 'idade', 'sexo', 'uf', 'municipio', 'lote', 'fornecedor', 'dose', 'dataaplicacao'])
 
 
-def load(spark: SparkSession, path_output: str, db_connection: any):
+def load_dimensions(spark: SparkSession, path_output: str, db_connection: any):
     cursor = db_connection.cursor()
 
+    print('Carregar tabela dimensão Vacinas')
     df_vacinas = read_parquet(spark, path_output, "vacinas")
     for r in df_vacinas.collect():
-        cursor.execute(sql_queries.default_upsert.format(tabela="vacinas", codigo=r.codigo, descricao=r.descricao))
+        cursor.execute(sql_queries.default_upsert.format(
+            tabela="vacinas", codigo=r.codigo, descricao=r.descricao))
     cursor.commit()
-    
+
+    print('Carregar tabela dimensão Categorias')
     df_categorias = read_parquet(spark, path_output, "categorias")
     for r in df_categorias.collect():
-        cursor.execute(sql_queries.default_upsert.format(tabela="categorias", codigo=r.codigo, descricao=r.descricao))
+        cursor.execute(sql_queries.default_upsert.format(
+            tabela="categorias", codigo=r.codigo, descricao=r.descricao))
     cursor.commit()
 
+    print('Carregar tabela dimensão Grupos')
     df_grupos = read_parquet(spark, path_output, "grupos")
     for r in df_grupos.collect():
-        cursor.execute(sql_queries.default_upsert.format(tabela="grupos", codigo=r.codigo, descricao=r.descricao))
+        cursor.execute(sql_queries.default_upsert.format(
+            tabela="grupos", codigo=r.codigo, descricao=r.descricao))
     cursor.commit()
 
+    print('Carregar tabela dimensão Estabelecimentos')
     df_estabelecimentos = read_parquet(spark, path_output, "estabelecimentos")
     for r in df_estabelecimentos.collect():
-        cursor.execute(sql_queries.estabelecimentos_upsert.format(codigo=r.codigo, descricao=r.descricao.replace("'", ""), razaosocial=r.razaosocial.replace("'", ""), uf=r.uf, municipio=r.municipio.replace("'", "")))
+        cursor.execute(sql_queries.estabelecimentos_upsert.format(codigo=r.codigo,
+                                                                  descricao=r.descricao.replace(
+                                                                      "'", ""),
+                                                                  razaosocial=r.razaosocial.replace(
+                                                                      "'", ""),
+                                                                  uf=r.uf,
+                                                                  municipio=r.municipio.replace("'", "")))
     cursor.commit()
 
 
-def save_dataframe_to_parquet(spark: SparkSession, df_table: DataFrame, file_path: str, table_name: str, check_content: bool = True, cols_notnull: list = None, cols_uniquekey: list = None):
-    if check_content and not check_has_content(df_table):
-        raise Exception(f'No content: {table_name}')
-    if cols_notnull is not None and not check_nulls(spark, df_table, cols_notnull, 0):
-        raise Exception(f'Null: {table_name}')
-    if cols_uniquekey is not None and not check_uniquekey(df_table, cols_uniquekey):
-        raise Exception(f'Unique Key Fail: {table_name}')
+def load_fact(spark: SparkSession, path_output: str, db_driver: str, db_server: str, db_name: str, db_user: str, db_password: str):
+    df_vacinacao = read_parquet(spark, path_output, "vacinacao")
 
-    write_parquet(df_table, file_path, table_name)
+    print('Carregar tabela fato Vacinação')
+    df_vacinacao.write.mode("overwrite") \
+        .format("jdbc") \
+        .option("url", f"jdbc:sqlserver://{db_server};databaseName={db_name};") \
+        .option("dbtable", 'vacinacao') \
+        .option("user", db_user) \
+        .option("password", db_password) \
+        .option("driver", db_driver) \
+        .option("truncate", 'true') \
+        .save()
+
 
 def main():
     # Read config file
@@ -171,16 +205,20 @@ def main():
 
     df = extract(spark, config_values['source_data'])
 
-    transform(spark, df, config_values['columns'], config_values['output_data'])
+    transform(spark, df, config_values['columns'],
+              config_values['output_data'])
 
     db = create_db_connection(
-        config['DB']['DRIVER'],
+        config['DB']['DRIVER_ODBC'],
         config['DB']['SERVER'],
         config['DB']['DATABASE'],
         config['DB']['USER'],
         config['DB']['PASSWORD'])
 
-    load(spark, config_values['output_data'], db)
+    load_dimensions(spark, config_values['output_data'], db)
+
+    load_fact(spark, config_values['output_data'], config['DB']['DRIVER_JDBC'], config['DB']
+              ['SERVER'], config['DB']['DATABASE'], config['DB']['USER'], config['DB']['PASSWORD'])
 
 
 if __name__ == "__main__":

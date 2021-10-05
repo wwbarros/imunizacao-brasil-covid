@@ -98,3 +98,60 @@ BEGIN
  WHERE [codigo] = {codigo} AND '{descricao}' <> 'N/A';
 END
 """)
+
+vacinacao_upsert = """
+INSERT INTO [dbo].[vacinacao]
+           ([paciente_id]
+           ,[estabelecimento]
+           ,[categoria]
+           ,[grupoatendimento]
+           ,[vacina]
+           ,[idade]
+           ,[sexo]
+           ,[uf]
+           ,[municipio]
+           ,[lote]
+           ,[fornecedor]
+           ,[dose]
+           ,[dataaplicacao])
+     SELECT {paciente_id}
+            ,{estabelecimento}
+            ,{categoria}
+            ,{grupoatendimento}
+            ,{vacina}
+            ,{idade}
+            ,'{sexo}'
+            ,'{uf}'
+            ,'{municipio}'
+            ,'{lote}'
+            ,'{fornecedor}'
+            ,'{dose}'
+            ,{dataaplicacao}
+       WHERE NOT EXISTS
+      (
+        SELECT 1 FROM dbo.[estabelecimentos] WITH (UPDLOCK, SERIALIZABLE)
+          WHERE [paciente_id] = {paciente_id}
+		  AND [estabelecimento] = {estabelecimento}
+		  AND [categoria] = {categoria}
+		  AND [grupoatendimento] = {grupoatendimento}
+		  AND [vacina] = {vacina}
+		  AND [idade] = {idade}
+      );
+IF @@ROWCOUNT = 0
+BEGIN
+  UPDATE [dbo].[vacinacao]
+   SET [sexo] = '{sexo}'
+      ,[uf] = '{uf}'
+      ,[municipio] = '{municipio}'
+      ,[lote] = '{lote}'
+      ,[fornecedor] = '{fornecedor}'
+      ,[dose] = '{dose}'
+      ,[dataaplicacao] = {dataaplicacao}
+	WHERE [paciente_id] = {paciente_id}
+		  AND [estabelecimento] = {estabelecimento}
+		  AND [categoria] = {categoria}
+		  AND [grupoatendimento] = {grupoatendimento}
+		  AND [vacina] = {vacina}
+		  AND [idade] = {idade};
+END
+"""
